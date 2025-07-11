@@ -116,6 +116,15 @@ Bu proje, ölçeklenebilir, sürdürülebilir ve test edilebilir bir kod tabanı
 
 ---
 
+## 🔗 Additional Resources / Ek Kaynaklar
+
+You can access additional screenshots, application videos, and the APK file from the following Google Drive link:
+Bu Google Drive bağlantısından ek ekran görüntülerine, uygulama videolarına ve APK dosyasına ulaşabilirsiniz:
+
+[Google Drive Link](https://drive.google.com/drive/folders/1_EVsEU7Tm-ayMMVdRrV_8vYSzEGxRLl3?usp=sharing)
+
+---
+
 ## 🚀 Kurulum & Çalıştırma / Installation & Setup
 1. **Depoyu Klonlayın / Clone the Repository:**
    ```sh
