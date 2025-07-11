@@ -9,7 +9,7 @@ import '../../../../custom/custom_image_widget.dart';
 import '../../../../core/injections/locator.dart';
 import '../../../../gen/assets.gen.dart';
 import '../../../../router/router.dart';
-import '../../../home/domain/models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 import '../bloc/favorite_movies/favorite_movies_bloc.dart';
 import '../bloc/profile/profile_bloc.dart';
 import '../bloc/profile/profile_event.dart';

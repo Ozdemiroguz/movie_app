@@ -14,7 +14,7 @@ import '../../../../custom/custom_image_widget.dart';
 import '../../../../custom/custom_loading_widget.dart';
 import '../../../../gen/assets.gen.dart';
 import '../../../../router/router.dart';
-import '../../domain/models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
@@ -60,19 +60,16 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             final hasMovies = state.paginatedMoviesResponse.movies.isNotEmpty;
 
-            // status.when kullanarak UI durumunu yönet
             return state.status.when(
               initial: () =>
                   const Center(child: CircularProgressIndicator.adaptive()),
               loading: () {
                 if (hasMovies) {
-                  // Mevcut filmler varken yükleniyorsa, içeriği göstermeye devam et
                   return _HomeContent(
                     height: height,
                     carouselController: _carouselController,
                   );
                 }
-                // İlk yükleme
                 return const CustomLoadingWidget();
               },
               loadingMore: () => _HomeContent(
@@ -83,19 +80,13 @@ class _HomePageState extends State<HomePage> {
                 height: height,
                 carouselController: _carouselController,
               ),
-              // _HomeContent(
-              //   height: height,
-              //   carouselController: _carouselController,
-              // ),
               failure: (message) {
                 if (hasMovies) {
-                  // Hata oluştu ama hala gösterilecek filmler var
                   return _HomeContent(
                     height: height,
                     carouselController: _carouselController,
                   );
                 }
-                // Gösterilecek film yok ve hata var
                 return CustomErrorWidget(
                   message: message,
                   onRetry: () {
@@ -155,7 +146,6 @@ class _CarouselSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sadece filmler listesi değiştiğinde yeniden çizim yap
     return BlocSelector<HomeBloc, HomeState, List<Movie>>(
       selector: (state) => state.paginatedMoviesResponse.movies,
       builder: (context, movies) {
@@ -208,7 +198,6 @@ class _LikeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sadece mevcut filmin favori durumu değiştiğinde yeniden çiz
     final currentMovie = context.select<HomeBloc, Movie?>((bloc) {
       final state = bloc.state;
       if (state.paginatedMoviesResponse.movies.isEmpty ||
@@ -312,7 +301,6 @@ class _BottomPart extends StatelessWidget {
       child: Stack(
         children: [
           const _GradientBackground(),
-          // const _BottomContent(),
         ],
       ),
     );
@@ -326,7 +314,6 @@ class _GradientBackground extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(bottom: 16, top: 32),
       child: const _BottomContent(),
-      // color: Colors.red,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,

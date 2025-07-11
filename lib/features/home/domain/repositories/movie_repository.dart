@@ -1,8 +1,7 @@
-// repositories/movies_repository.dart
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/models/failure/failure.dart';
-import '../models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 import '../models/paginated_movie_response/paginate_movie_response.dart';
 
 abstract class MoviesRepository {

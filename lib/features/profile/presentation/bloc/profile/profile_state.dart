@@ -1,11 +1,9 @@
-// lib/features/profile/presentation/bloc/profile_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../domain/models/profile/profile_model.dart';
 
 part 'profile_state.freezed.dart';
 
-// Tek seferlik olayları (yan etkileri) tanımlayalım.
 @freezed
 abstract class ProfileSingleTimeEvent with _$ProfileSingleTimeEvent {
   const factory ProfileSingleTimeEvent.navigateToLogin() = NavigateToLogin;
@@ -15,7 +13,6 @@ abstract class ProfileSingleTimeEvent with _$ProfileSingleTimeEvent {
       ShowSuccessToast;
 }
 
-// Sayfanın genel durumunu temsil eden union type.
 @freezed
 abstract class ProfileStatus with _$ProfileStatus {
   const factory ProfileStatus.initial() = _Initial;
@@ -29,9 +26,7 @@ abstract class ProfileState with _$ProfileState {
   const factory ProfileState({
     required ProfileStatus status,
     required ProfileModel profile,
-    // languageChanged gibi UI'a özel durumlar burada kalabilir.
     required bool languageChanged,
-    // Tek seferlik olaylar için.
     ProfileSingleTimeEvent? singleTimeEvent,
   }) = _ProfileState;
 

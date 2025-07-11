@@ -12,6 +12,7 @@ import '../../domain/repositories/movie_repository.dart';
 import '../bloc/home_bloc.dart';
 import '../../../profile/presentation/bloc/profile/profile_bloc.dart';
 import '../../../profile/domain/repositories/profile_repository.dart';
+import '../../../../services/logger/logger_service.dart';
 
 @RoutePage()
 class HomeNavBarPage extends StatelessWidget {
@@ -25,11 +26,13 @@ class HomeNavBarPage extends StatelessWidget {
           BlocProvider(
               create: (context) => HomeBloc(
                     getIt<MoviesRepository>(),
+                    getIt<LoggerService>(),
                   )),
           BlocProvider(
               create: (context) => ProfileBloc(
                     getIt<ProfileRepository>(),
                     getIt<AuthRepository>(),
+                    getIt<LoggerService>(),
                   )),
         ],
         child: AutoTabsRouter(

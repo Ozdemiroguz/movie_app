@@ -1,8 +1,6 @@
-// lib/features/movies/domain/models/paginated_movie_response.dart
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../../core/models/pagination/pagination.dart';
-import '../movie/movie.dart';
+import '../../../../../core/models/movie/movie.dart';
 
 part 'paginate_movie_response.freezed.dart';
 

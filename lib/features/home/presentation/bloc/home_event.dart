@@ -1,13 +1,11 @@
-// lib/features/home/presentation/bloc/home_event.dart
 import 'dart:async';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 
 part 'home_event.freezed.dart';
 
 @freezed
-// 'abstract' kelimesini kaldırıyoruz ve public isimlendirme kullanıyoruz.
 class HomeEvent with _$HomeEvent {
   const factory HomeEvent.initialized({Completer<void>? completer}) =
       Initialized;

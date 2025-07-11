@@ -14,7 +14,7 @@ import '../../../../custom/custom_app_bar.dart';
 import '../../../../custom/custom_filled_button.dart';
 import '../../../../gen/assets.gen.dart';
 import '../../../../router/router.dart';
-// ProfileEvent için alias (takma ad) kullanarak isim çakışmasını önlüyoruz.
+import '../../../../services/logger/logger_service.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../bloc/profile_image_update/profile_image_update_bloc.dart';
 import '../bloc/profile_image_update/profile_image_update_event.dart';
@@ -31,24 +31,21 @@ class ProfileImageUpdatePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Bu sayfanın kendi BLoC'u olduğu için, onu burada sağlıyoruz.
-    // Bu, sayfa kapandığında BLoC'un da dispose edilmesini sağlar.
     return BlocProvider(
       create: (context) => ProfileImageUpdateBloc(
         getIt<ProfileRepository>(),
+        getIt<LoggerService>(),
       ),
       child: BlocListener<ProfileImageUpdateBloc, ProfileImageUpdateState>(
         listenWhen: (p, c) =>
             c.singleTimeEvent != null || p.isLoading != c.isLoading,
         listener: (context, state) {
-          // Loading Overlay
           if (state.isLoading) {
             LoadingScreen().show(context: context);
           } else {
             LoadingScreen().hide();
           }
 
-          // Tek Seferlik Olaylar (Toast, Navigasyon)
           state.singleTimeEvent?.when(
             uploadSuccess: (newImageUrl) {
               CherryToast.success(
@@ -60,7 +57,6 @@ class ProfileImageUpdatePage extends StatelessWidget {
               if (isSetupAccount) {
                 AutoRouter.of(context).replaceAll([const HomeNavBarRoute()]);
               } else {
-                // Bir önceki sayfadaki ProfileBloc'u yeni veriyi çekmesi için tetikle.
                 AutoRouter.of(context).pop(true);
               }
             },
@@ -160,7 +156,6 @@ class _ImageSourceBottomSheet extends StatelessWidget {
     return SafeArea(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        // mainAxisSize: MainAxisSize.min,
         children: [
           _ImageSourceOption(
               icon: Icons.camera_alt,

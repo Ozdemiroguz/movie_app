@@ -5,47 +5,45 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../../../core/models/failure/failure.dart';
-import '../../domain/models/movie/movie.dart';
+import '../../../../services/logger/logger_service.dart';
+import '../../../../core/models/movie/movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 
+@injectable
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final MoviesRepository _moviesRepository;
+  final LoggerService _logger;
   StreamSubscription<Either<Failure, List<Movie>>>? _favoritesSubscription;
 
-  HomeBloc(this._moviesRepository) : super(HomeState.initial()) {
-    // 1. BLoC oluşturulur oluşturulmaz, favori değişikliklerini dinlemeye başla.
+  HomeBloc(this._moviesRepository, this._logger) : super(HomeState.initial()) {
     _listenToFavoritesChanges();
 
-    // 2. Event handler'ları kaydet.
     on<Initialized>(_onInitialized);
-    on<MoreMoviesFetched>(_onMoreMoviesFetched,
-        transformer: droppable()); // Spam'i önle
+    on<MoreMoviesFetched>(_onMoreMoviesFetched, transformer: droppable());
     on<PageChanged>(_onPageChanged);
     on<FavoriteToggled>(_onFavoriteToggled);
     on<OnFavoritesChanged>(_onFavoritesChanged);
     on<DescriptionVisibilityChanged>(_onDescriptionVisibilityChanged);
 
-    // 3. Başlangıç verilerini çekmek için ilk event'i gönder.
     add(const HomeEvent.initialized());
   }
 
-  /// MoviesRepository'deki favori stream'ini dinler ve her yeni veri
-  /// geldiğinde bir `OnFavoritesChanged` event'i tetikler.
   void _listenToFavoritesChanges() {
     _favoritesSubscription =
         _moviesRepository.watchFavoriteMovies().listen((result) {
       result.fold(
         (failure) {
-          // Stream'den bir hata gelirse, bunu da bir state olarak yansıtabiliriz.
-          add(HomeEvent.onFavoritesChanged(
-              favoriteMovies: [])); // veya bir hata durumu
+          _logger.e('Failed to listen to favorites changes stream.',
+              error: failure);
+          add(HomeEvent.onFavoritesChanged(favoriteMovies: []));
         },
         (favoriteMovies) {
-          // Stream'den yeni bir favori listesi geldi.
+          _logger.i('Favorite movies stream updated.');
           add(HomeEvent.onFavoritesChanged(favoriteMovies: favoriteMovies));
         },
       );
@@ -54,51 +52,49 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Future<void> close() {
-    // BLoC yok edilirken stream aboneliğini iptal etmeyi unutma!
     _favoritesSubscription?.cancel();
     return super.close();
   }
 
-  /// Sayfa ilk yüklendiğinde veya yenilendiğinde çağrılır.
   Future<void> _onInitialized(
       Initialized event, Emitter<HomeState> emit) async {
-    // Ensure favorite movies are refreshed whenever the HomeBloc is initialized
     await _moviesRepository.refreshFavoriteMovies();
+    _logger.i('HomeBloc initialized. Refreshing movie data.');
 
     emit(state.copyWith(status: const HomeStatus.loading()));
     final result = await _moviesRepository.getPaginatedMovies(page: 1);
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: HomeStatus.failure(
-          message: failure.message,
-        ),
-        singleTimeEvent: HomeSingleTimeEvent.showErrorToast(failure.message),
-      )),
+      (failure) {
+        _logger.e('Failed to initialize HomeBloc with movies data.',
+            error: failure);
+        emit(state.copyWith(
+          status: HomeStatus.failure(
+            message: failure.message,
+          ),
+          singleTimeEvent: HomeSingleTimeEvent.showErrorToast(failure.message),
+        ));
+      },
       (paginatedResponse) {
-        // Filmler başarıyla çekildi. Favori durumları, stream'den gelen
-        // ilk `OnFavoritesChanged` eventi ile otomatik olarak senkronize edilecek.
+        _logger.i('Successfully initialized HomeBloc with movies data.');
         emit(state.copyWith(
           paginatedMoviesResponse: paginatedResponse,
           status: const HomeStatus.success(),
           singleTimeEvent:
               HomeSingleTimeEvent.showSuccessToast('movies_updated'.tr()),
-          currentIndex: 0, // Yenileme yapıldığında indeksi sıfırla.
+          currentIndex: 0,
         ));
       },
     );
     event.completer?.complete();
   }
 
-  /// Stream'den yeni bir favori listesi geldiğinde tetiklenir.
   void _onFavoritesChanged(OnFavoritesChanged event, Emitter<HomeState> emit) {
     final favoriteMovies = event.favoriteMovies;
     final currentMovies = state.paginatedMoviesResponse.movies;
 
-    // Ana film listesini, yeni favori listesine göre senkronize et.
     final updatedMovies = currentMovies.map((movie) {
       final isFavorite = favoriteMovies.any((fav) => fav.id == movie.id);
-      // Sadece durumu değişen filmler için yeni nesne oluştur (performans).
       return movie.isFavorite == isFavorite
           ? movie
           : movie.copyWith(isFavorite: isFavorite);
@@ -110,29 +106,32 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ));
   }
 
-  /// Daha fazla film yüklemek için çağrılır.
   Future<void> _onMoreMoviesFetched(
       MoreMoviesFetched event, Emitter<HomeState> emit) async {
     final pagination = state.paginatedMoviesResponse.pagination;
     if (state.status == const HomeStatus.loadingMore() ||
         pagination.currentPage >= pagination.totalPages) {
+      _logger.d(
+          'Attempted to fetch more movies but already loading or no more pages.');
       return;
     }
+    _logger.i(
+        'Fetching more movies. Current page: ${pagination.currentPage}, Total pages: ${pagination.totalPages}');
     emit(state.copyWith(status: const HomeStatus.loadingMore()));
 
     final nextPage = pagination.currentPage + 1;
     final result = await _moviesRepository.getPaginatedMovies(page: nextPage);
 
     result.fold(
-      (failure) => emit(
-          state.copyWith(status: HomeStatus.failure(message: failure.message))),
+      (failure) {
+        _logger.e('Failed to fetch more movies.', error: failure);
+        emit(state.copyWith(
+            status: HomeStatus.failure(message: failure.message)));
+      },
       (newResponse) {
         final allMovies = List<Movie>.from(state.paginatedMoviesResponse.movies)
           ..addAll(newResponse.movies);
 
-        // Yeni gelen filmlerin de favori durumunu senkronize etmemiz gerekebilir.
-        // Ama bu zaten stream'den gelen bir sonraki OnFavoritesChanged ile hallolacak.
-        // Bu yüzden burada ek bir senkronizasyona gerek yok.
         emit(state.copyWith(
           paginatedMoviesResponse: state.paginatedMoviesResponse.copyWith(
             movies: allMovies,
@@ -140,51 +139,57 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           ),
           status: const HomeStatus.success(),
         ));
+        _logger.i(
+            'Successfully fetched more movies. New total movies: ${allMovies.length}');
       },
     );
   }
 
-  /// Kullanıcı filmler arasında kaydırdığında çağrılır.
   void _onPageChanged(PageChanged event, Emitter<HomeState> emit) {
     if (state.currentIndex == event.newIndex) return;
+    _logger.i('Page changed to index: ${event.newIndex}.');
 
     emit(state.copyWith(
       currentIndex: event.newIndex,
       singleTimeEvent: null,
     ));
 
-    // Listenin sondan ikinci elemanına gelindiğinde yeni filmleri çek.
     if (event.newIndex >= state.paginatedMoviesResponse.movies.length - 2 &&
         state.paginatedMoviesResponse.movies.isNotEmpty) {
+      _logger.i('Reached near end of movie list. Triggering more movie fetch.');
       add(const HomeEvent.moreMoviesFetched());
     }
   }
 
-  /// Bir filmin favori durumu değiştirildiğinde çağrılır.
   Future<void> _onFavoriteToggled(
       FavoriteToggled event, Emitter<HomeState> emit) async {
-    // Bu metod artık inanılmaz derecede basit.
-    // Sadece komutu Repository'ye gönderiyor.
+    _logger.i('Toggling favorite status for movie ID: ${event.movieId}');
     final result =
         await _moviesRepository.toggleFavorite(movieId: event.movieId);
     emit(state.copyWith(
       singleTimeEvent:
           HomeSingleTimeEvent.showSuccessToast('favorite_updated'.tr()),
     ));
-    // Hata olursa UI'a bildir. Başarılı olursa hiçbir şey yapma,
-    // çünkü Repository'nin stream'i değişikliği zaten BLoC'a bildirecek.
     result.fold(
-      () {}, // Başarı durumunda BLoC'un state'i doğrudan değiştirmesine gerek yok.
-      (failure) => emit(state.copyWith(
-        status: HomeStatus.failure(message: failure.message),
-        singleTimeEvent: HomeSingleTimeEvent.showErrorToast(failure.message),
-      )),
+      () {
+        _logger.i(
+            'Successfully toggled favorite status for movie ID: ${event.movieId}.');
+      },
+      (failure) {
+        _logger.e(
+            'Failed to toggle favorite status for movie ID: ${event.movieId}.',
+            error: failure);
+        emit(state.copyWith(
+          status: HomeStatus.failure(message: failure.message),
+          singleTimeEvent: HomeSingleTimeEvent.showErrorToast(failure.message),
+        ));
+      },
     );
   }
 
-  /// Açıklama metninin görünürlüğü değiştiğinde çağrılır.
   void _onDescriptionVisibilityChanged(
       DescriptionVisibilityChanged event, Emitter<HomeState> emit) {
+    _logger.i('Description visibility changed to: ${event.isExpanded}.');
     emit(state.copyWith(isDescriptionExpanded: event.isExpanded));
   }
 }

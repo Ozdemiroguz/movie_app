@@ -1,24 +1,18 @@
-// lib/features/movies/domain/models/movie.dart
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'movie.freezed.dart';
-// .g.dart'ı kullanmıyoruz çünkü fromJson'ı manuel yazıyoruz.
 
 @freezed
 abstract class Movie with _$Movie {
   const Movie._();
 
   const factory Movie({
-    // --- MEVCUT ZORUNLU ALANLARINIZ (AYNEN KALIYOR) ---
     required String id,
     required String title,
     required String description,
     required String posterUrl,
     required String director,
     @Default(false) bool isFavorite,
-
-    // --- YENİ EKLENEN OPSİYONEL (NULLABLE) ALANLAR ---
     String? year,
     String? rated,
     String? released,
@@ -42,14 +36,12 @@ abstract class Movie with _$Movie {
   /// Mevcut alanların okunma mantığına DOKUNULMADI.
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-      // --- MEVCUT ALANLARIN OKUNMASI (AYNEN KALIYOR) ---
       id: (json['id'] ?? json['_id'])?.toString() ?? '',
       title: (json['Title'] as String?) ?? '',
       description: (json['Plot'] as String?) ?? '',
       posterUrl: (json['Poster'] as String?) ?? '',
       director: (json['Director'] as String?) ?? '',
       isFavorite: json['isFavorite'] as bool? ?? false,
-
       year: json['Year'] as String?,
       rated: json['Rated'] as String?,
       released: json['Released'] as String?,

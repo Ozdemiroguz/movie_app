@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:test_case/features/home/domain/models/movie/movie.dart';
+import 'package:test_case/core/models/movie/movie.dart';
 import 'package:test_case/features/home/presentation/pages/home_page.dart';
 import 'package:test_case/features/profile/presentation/pages/profile_page.dart';
 

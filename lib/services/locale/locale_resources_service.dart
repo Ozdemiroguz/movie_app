@@ -12,7 +12,6 @@ abstract class LocaleResourcesService {
   bool getRememberMe();
   Future<void> setRememberMe(bool value);
 
-  /// Clears all data from secure storage. Use with caution.
   Future<void> clearSecureStorage();
   Future<void> deleteAll();
 

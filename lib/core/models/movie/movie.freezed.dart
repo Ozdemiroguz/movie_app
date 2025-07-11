@@ -14,13 +14,12 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$Movie {
-// --- MEVCUT ZORUNLU ALANLARINIZ (AYNEN KALIYOR) ---
   String get id;
   String get title;
   String get description;
   String get posterUrl;
   String get director;
-  bool get isFavorite; // --- YENİ EKLENEN OPSİYONEL (NULLABLE) ALANLAR ---
+  bool get isFavorite;
   String? get year;
   String? get rated;
   String? get released;
@@ -612,7 +611,6 @@ class _Movie extends Movie {
       : _images = images,
         super._();
 
-// --- MEVCUT ZORUNLU ALANLARINIZ (AYNEN KALIYOR) ---
   @override
   final String id;
   @override
@@ -626,7 +624,6 @@ class _Movie extends Movie {
   @override
   @JsonKey()
   final bool isFavorite;
-// --- YENİ EKLENEN OPSİYONEL (NULLABLE) ALANLAR ---
   @override
   final String? year;
   @override

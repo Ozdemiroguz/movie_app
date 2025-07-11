@@ -692,9 +692,8 @@ class _Failure implements ProfileStatus {
 /// @nodoc
 mixin _$ProfileState {
   ProfileStatus get status;
-  ProfileModel
-      get profile; // languageChanged gibi UI'a özel durumlar burada kalabilir.
-  bool get languageChanged; // Tek seferlik olaylar için.
+  ProfileModel get profile;
+  bool get languageChanged;
   ProfileSingleTimeEvent? get singleTimeEvent;
 
   /// Create a copy of ProfileState
@@ -997,10 +996,8 @@ class _ProfileState implements ProfileState {
   final ProfileStatus status;
   @override
   final ProfileModel profile;
-// languageChanged gibi UI'a özel durumlar burada kalabilir.
   @override
   final bool languageChanged;
-// Tek seferlik olaylar için.
   @override
   final ProfileSingleTimeEvent? singleTimeEvent;
 

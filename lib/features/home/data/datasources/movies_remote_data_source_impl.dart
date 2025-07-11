@@ -6,14 +6,16 @@ import 'package:injectable/injectable.dart';
 import '../../../../constants/api_endpoints.dart';
 import '../../../../core/models/failure/failure.dart';
 import '../../../../services/network/network_service.dart';
+import '../../../../services/logger/logger_service.dart';
 import '../../domain/datasources/movies_remote_data_source.dart';
-import '../../domain/models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 import '../../domain/models/paginated_movie_response/paginate_movie_response.dart';
 
 @LazySingleton(as: MoviesRemoteDataSource)
 class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
   final NetworkService _networkService;
-  const MoviesRemoteDataSourceImpl(this._networkService);
+  final LoggerService _logger;
+  const MoviesRemoteDataSourceImpl(this._networkService, this._logger);
 
   @override
   Future<Either<Failure, PaginatedMoviesResponse>> getPaginatedMovies(
@@ -34,7 +36,9 @@ class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
           }
           final paginatedResponse = PaginatedMoviesResponse.fromJson(innerData);
           return right(paginatedResponse);
-        } catch (e) {
+        } catch (e, s) {
+          _logger.e("Failed to parse paginated movies: $e",
+              error: e, stackTrace: s);
           return left(
               Failure.unknownError("Failed to parse paginated movies: $e"));
         }
@@ -60,7 +64,9 @@ class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
                   Movie.fromJson(movieJson as Map<String, dynamic>))
               .toList();
           return right(movies);
-        } catch (e) {
+        } catch (e, s) {
+          _logger.e("Failed to parse favorite movies: $e",
+              error: e, stackTrace: s);
           return left(
               Failure.unknownError("Failed to parse favorite movies: $e"));
         }
@@ -73,11 +79,9 @@ class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
     final url = Endpoints.favoriteMovie(movieId);
     final result = await _networkService.post(url);
 
-    // post metodu zaten `Either` döndürdüğü için, fold ile sonucu
-    // Option'a çeviriyoruz.
     return result.fold(
-      (failure) => some(failure), // Hata varsa some(failure)
-      (_) => none(), // Başarılıysa none()
+      (failure) => some(failure),
+      (_) => none(),
     );
   }
 }

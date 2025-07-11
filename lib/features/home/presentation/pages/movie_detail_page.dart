@@ -5,7 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../../custom/custom_icon_widget.dart';
 import '../../../../custom/custom_image_widget.dart';
-import '../../domain/models/movie/movie.dart';
+import '../../../../core/models/movie/movie.dart';
 
 @RoutePage()
 class MovieDetailPage extends StatelessWidget {
@@ -96,7 +96,6 @@ class _MovieMediaSectionState extends State<_MovieMediaSection> {
   Widget build(BuildContext context) {
     final images = widget.movie.images;
 
-    // Eğer images varsa carousel göster
     if (images.isNotEmpty) {
       return Container(
         height: 400,
@@ -123,8 +122,6 @@ class _MovieMediaSectionState extends State<_MovieMediaSection> {
                 );
               }).toList(),
             ),
-
-            // Indicator
             if (images.length > 1)
               Positioned(
                 bottom: 16,
@@ -151,7 +148,6 @@ class _MovieMediaSectionState extends State<_MovieMediaSection> {
         ),
       );
     } else {
-      // Images yoksa poster göster
       return Container(
         height: 400,
         width: double.infinity,
@@ -263,71 +259,54 @@ class _MovieDetailedInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Director
         if (movie.director.isNotEmpty)
           _InfoItem(
             title: 'director'.tr(),
             value: movie.director,
             icon: Icons.movie_creation,
           ),
-
-        // Genre
         if (movie.genre != null && movie.genre!.isNotEmpty)
           _InfoItem(
             title: 'genre'.tr(),
             value: movie.genre!,
             icon: Icons.category,
           ),
-
-        // Runtime
         if (movie.runtime != null && movie.runtime!.isNotEmpty)
           _InfoItem(
             title: 'runtime'.tr(),
             value: movie.runtime!,
             icon: Icons.access_time,
           ),
-
-        // Actors
         if (movie.actors != null && movie.actors!.isNotEmpty)
           _InfoItem(
             title: 'actors'.tr(),
             value: movie.actors!,
             icon: Icons.people,
           ),
-
-        // Writer
         if (movie.writer != null && movie.writer!.isNotEmpty)
           _InfoItem(
             title: 'writer'.tr(),
             value: movie.writer!,
             icon: Icons.create,
           ),
-
-        // Country
         if (movie.country != null && movie.country!.isNotEmpty)
           _InfoItem(
             title: 'country'.tr(),
             value: movie.country!,
             icon: Icons.flag,
           ),
-
-        // Language
         if (movie.language != null && movie.language!.isNotEmpty)
           _InfoItem(
             title: 'language'.tr(),
             value: movie.language!,
             icon: Icons.language,
           ),
-
-        // Released
         if (movie.released != null && movie.released!.isNotEmpty)
           _InfoItem(
             title: 'released'.tr(),
             value: movie.released!,
             icon: Icons.event,
           ),
-
-        // Awards
         if (movie.awards != null && movie.awards!.isNotEmpty)
           _InfoItem(
             title: 'awards'.tr(),

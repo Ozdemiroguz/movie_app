@@ -342,13 +342,8 @@ class _$ShowErrorToastCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$ProfileImageUpdateState {
-  /// Kullanıcının seçtiği lokal dosya.
   File? get selectedImageFile;
-
-  /// Yükleme işleminin durumu.
   bool get isLoading;
-
-  /// Tek seferlik olayları yönetmek için.
   ImageUpdateSingleTimeEvent? get singleTimeEvent;
 
   /// Create a copy of ProfileImageUpdateState
@@ -617,15 +612,10 @@ class _ProfileImageUpdateState implements ProfileImageUpdateState {
   const _ProfileImageUpdateState(
       {this.selectedImageFile, required this.isLoading, this.singleTimeEvent});
 
-  /// Kullanıcının seçtiği lokal dosya.
   @override
   final File? selectedImageFile;
-
-  /// Yükleme işleminin durumu.
   @override
   final bool isLoading;
-
-  /// Tek seferlik olayları yönetmek için.
   @override
   final ImageUpdateSingleTimeEvent? singleTimeEvent;
 

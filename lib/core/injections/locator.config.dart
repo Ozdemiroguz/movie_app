@@ -36,6 +36,7 @@ import '../../features/home/domain/datasources/movies_remote_data_source.dart'
     as _i614;
 import '../../features/home/domain/repositories/movie_repository.dart'
     as _i1023;
+import '../../features/home/presentation/bloc/home_bloc.dart' as _i202;
 import '../../features/profile/data/datasources/profile_remote_data_source_impl.dart'
     as _i1036;
 import '../../features/profile/data/repositories/profile_repository_impl.dart'
@@ -48,6 +49,8 @@ import '../../features/profile/presentation/bloc/favorite_movies/favorite_movies
     as _i35;
 import '../../features/profile/presentation/bloc/profile/profile_bloc.dart'
     as _i717;
+import '../../features/profile/presentation/bloc/profile_image_update/profile_image_update_bloc.dart'
+    as _i963;
 import '../../router/router.dart' as _i295;
 import '../../services/jwt/jwt_service.dart' as _i769;
 import '../../services/jwt/jwt_service_impl.dart' as _i47;
@@ -111,24 +114,51 @@ extension GetItInjectableX on _i174.GetIt {
           localeResourcesService: gh<_i354.LocaleResourcesService>(),
           networkInfo: gh<_i538.NetworkInfo>(),
         ));
+    gh.lazySingleton<_i614.MoviesRemoteDataSource>(
+        () => _i562.MoviesRemoteDataSourceImpl(
+              gh<_i298.NetworkService>(),
+              gh<_i238.LoggerService>(),
+            ));
     gh.lazySingleton<_i226.ProfileRemoteDataSource>(
-        () => _i1036.ProfileRemoteDataSourceImpl(gh<_i298.NetworkService>()));
+        () => _i1036.ProfileRemoteDataSourceImpl(
+              gh<_i298.NetworkService>(),
+              gh<_i238.LoggerService>(),
+            ));
+    gh.lazySingleton<_i1023.MoviesRepository>(() => _i464.MoviesRepositoryImpl(
+          gh<_i614.MoviesRemoteDataSource>(),
+          gh<_i238.LoggerService>(),
+        ));
     gh.lazySingleton<_i841.AuthRemoteDataSource>(
         () => _i123.AuthRemoteDataSourceImpl(
               gh<_i298.NetworkService>(),
               gh<_i238.LoggerService>(),
             ));
-    gh.lazySingleton<_i614.MoviesRemoteDataSource>(
-        () => _i562.MoviesRemoteDataSourceImpl(gh<_i298.NetworkService>()));
-    gh.lazySingleton<_i894.ProfileRepository>(
-        () => _i334.ProfileRepositoryImpl(gh<_i226.ProfileRemoteDataSource>()));
-    gh.lazySingleton<_i1023.MoviesRepository>(
-        () => _i464.MoviesRepositoryImpl(gh<_i614.MoviesRemoteDataSource>()));
+    gh.factory<_i202.HomeBloc>(() => _i202.HomeBloc(
+          gh<_i1023.MoviesRepository>(),
+          gh<_i238.LoggerService>(),
+        ));
+    gh.factory<_i35.FavoriteMoviesBloc>(() => _i35.FavoriteMoviesBloc(
+          gh<_i1023.MoviesRepository>(),
+          gh<_i238.LoggerService>(),
+        ));
+    gh.lazySingleton<_i894.ProfileRepository>(() => _i334.ProfileRepositoryImpl(
+          gh<_i226.ProfileRemoteDataSource>(),
+          gh<_i238.LoggerService>(),
+        ));
     gh.lazySingleton<_i787.AuthRepository>(() => _i153.AuthRepositoryImpl(
           remoteDataSource: gh<_i841.AuthRemoteDataSource>(),
           localeResourcesService: gh<_i354.LocaleResourcesService>(),
           networkService: gh<_i298.NetworkService>(),
           logger: gh<_i238.LoggerService>(),
+        ));
+    gh.factory<_i717.ProfileBloc>(() => _i717.ProfileBloc(
+          gh<_i894.ProfileRepository>(),
+          gh<_i787.AuthRepository>(),
+          gh<_i238.LoggerService>(),
+        ));
+    gh.factory<_i963.ProfileImageUpdateBloc>(() => _i963.ProfileImageUpdateBloc(
+          gh<_i894.ProfileRepository>(),
+          gh<_i238.LoggerService>(),
         ));
     gh.factory<_i173.SignupBloc>(() => _i173.SignupBloc(
           authRepository: gh<_i787.AuthRepository>(),
@@ -138,12 +168,6 @@ extension GetItInjectableX on _i174.GetIt {
           authRepository: gh<_i787.AuthRepository>(),
           logger: gh<_i238.LoggerService>(),
         ));
-    gh.factory<_i717.ProfileBloc>(() => _i717.ProfileBloc(
-          gh<_i894.ProfileRepository>(),
-          gh<_i787.AuthRepository>(),
-        ));
-    gh.factory<_i35.FavoriteMoviesBloc>(
-        () => _i35.FavoriteMoviesBloc(gh<_i1023.MoviesRepository>()));
     return this;
   }
 }
