@@ -22,19 +22,15 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
-      // Sadece locale değiştiğinde yeniden build et
       buildWhen: (previous, current) => previous.locale != current.locale,
       builder: (context, settingsState) {
         return BlocListener<ProfileBloc, ProfileState>(
-          // Sadece tek seferlik olayları dinle (navigasyon, toast vb.)
           listenWhen: (p, c) => p.singleTimeEvent != c.singleTimeEvent,
           listener: (context, state) {
             state.singleTimeEvent?.when(
               navigateToLogin: () {
                 AutoRouter.of(context).replaceAll([const AuthWrapperRoute()]);
               },
-              // Toast gibi diğer olaylar buraya eklenebilir.
-              // Bu örnekte BlocBuilder içinde yönetilmeyenler burada kalır.
               showErrorToast: (message) {},
               showSuccessToast: (message) {},
             );
@@ -77,7 +73,6 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-/// Profil sayfasının başarılı durumda gösterilecek ana içeriği.
 class _ProfileContentView extends StatelessWidget {
   final ProfileState state;
   const _ProfileContentView({required this.state});

@@ -67,9 +67,7 @@ class _LanguageSetting extends StatelessWidget {
         value: EasyLocalization.of(context)?.locale,
         onChanged: (Locale? newLocale) {
           if (newLocale != null) {
-            // EasyLocalization'ı anında güncelle
             context.setLocale(newLocale);
-            // SettingsBloc'a da kaydet
             context
                 .read<SettingsBloc>()
                 .add(SettingsEvent.localeChanged(newLocale));

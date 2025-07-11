@@ -25,8 +25,6 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
         AutoRoute(page: SplashRoute.page, initial: true),
-
-        // // Auth akışı. BLoC sağlama işini AuthWrapperPage'in kendisi yapıyor.
         AutoRoute(
           page: AuthWrapperRoute.page,
           children: [
@@ -34,23 +32,18 @@ class AppRouter extends RootStackRouter {
             AutoRoute(page: RegisterRoute.page, path: 'register'),
           ],
         ),
-
         AutoRoute(
           page: ProfileImageUpdateRoute.page,
         ),
-
         AutoRoute(
           page: DetailedProfileRoute.page,
         ),
-
         AutoRoute(
           page: SettingsRoute.page,
         ),
-
         AutoRoute(
           page: MovieDetailRoute.page,
         ),
-
         AutoRoute(
           page: HomeNavBarRoute.page,
           children: [
@@ -58,7 +51,5 @@ class AppRouter extends RootStackRouter {
             AutoRoute(page: ProfileRoute.page, path: 'profile'),
           ],
         ),
-
-        // ... diğer rotalarınız
       ];
 }

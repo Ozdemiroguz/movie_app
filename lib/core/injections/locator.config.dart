@@ -92,27 +92,32 @@ extension GetItInjectableX on _i174.GetIt {
         () => registerModule.firebaseCrashlytics);
     gh.lazySingleton<_i931.UseCase<String, _i100.Uint8List>>(
         () => const _i112.Base64Encode());
-    gh.lazySingleton<_i538.NetworkInfo>(
-        () => _i184.NetworkInfoImpl(connectivity: gh<_i318.Connectivity>()));
+    gh.lazySingleton<_i769.JwtService>(() => _i47.JwtServiceImpl());
+    gh.lazySingleton<_i238.LoggerService>(() => _i585.LoggerServiceImpl());
+    gh.lazySingleton<_i538.NetworkInfo>(() => _i184.NetworkInfoImpl(
+          connectivity: gh<_i318.Connectivity>(),
+          logger: gh<_i238.LoggerService>(),
+        ));
     gh.lazySingleton<_i354.LocaleResourcesService>(
         () => _i94.LocaleResourcesServiceImpl(
               gh<_i460.SharedPreferences>(),
               gh<_i558.FlutterSecureStorage>(),
+              gh<_i238.LoggerService>(),
             ));
-    gh.lazySingleton<_i769.JwtService>(() => _i47.JwtServiceImpl());
-    gh.lazySingleton<_i238.LoggerService>(() => _i585.LoggerServiceImpl());
     gh.factoryParam<_i761.SettingsBloc, _i409.ThemeMode?, dynamic>((
       initialThemeMode,
       _,
     ) =>
         _i761.SettingsBloc(
           gh<_i354.LocaleResourcesService>(),
+          gh<_i238.LoggerService>(),
           initialThemeMode,
         ));
     gh.lazySingleton<_i298.NetworkService>(() => _i669.NetworkServiceImpl(
           gh<_i361.Dio>(),
           localeResourcesService: gh<_i354.LocaleResourcesService>(),
           networkInfo: gh<_i538.NetworkInfo>(),
+          logger: gh<_i238.LoggerService>(),
         ));
     gh.lazySingleton<_i614.MoviesRemoteDataSource>(
         () => _i562.MoviesRemoteDataSourceImpl(

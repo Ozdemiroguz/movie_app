@@ -32,15 +32,13 @@ class DetailedProfilePage extends StatelessWidget {
             _LimitedOfferButton(),
           ],
         ),
-        // Bu sayfada birden fazla BLoC'tan veri okuduğumuz için,
-        // her bölümü kendi BlocBuilder'ı ile sarmalamak en temiz yöntemdir.
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _ProfileHeaderSection(), // Header'ı kendi widget'ına ayırdık
+            const _ProfileHeaderSection(),
             const SizedBox(height: 28),
             const _LikedMoviesTitle(),
-            const _FavoriteMovies(), // Favori filmleri kendi widget'ına ayırdık
+            const _FavoriteMovies(),
           ],
         ),
       ),
@@ -53,11 +51,10 @@ class _FavoriteMovies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Bu widget SADECE HomeBloc'u dinler ve favori filmleri seçer.
-    // Repository'deki stream sayesinde, bu liste her zaman günceldir.
     return BlocProvider(
         create: (context) => getIt<FavoriteMoviesBloc>(),
         child: BlocBuilder<FavoriteMoviesBloc, FavoriteMoviesState>(
+          buildWhen: (p, c) => true,
           builder: (context, state) {
             return state.when(
               initial: () => const SizedBox.shrink(),
@@ -102,7 +99,6 @@ class _ProfileHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Bu widget SADECE ProfileBloc'u dinler.
     return BlocBuilder<ProfileBloc, ProfileState>(
       buildWhen: (p, c) => p.profile != c.profile,
       builder: (context, state) {
